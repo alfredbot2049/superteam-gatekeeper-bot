@@ -13,7 +13,9 @@ async function handleNewMember(ctx) {
       console.log(`[Gatekeeper] Sent DM to ${member.username || member.id}`);
     } catch {
       // User hasn't started chat with bot — send in group
-      await ctx.reply(config.templates.welcome);
+      const sentMsg = await ctx.reply(config.templates.welcome);
+    // Auto-pin welcome message
+    try { await ctx.pinChatMessage(sentMsg.message_id); } catch {}
       console.log(`[Gatekeeper] Sent in-group welcome for ${member.username || member.id}`);
     }
   }
@@ -89,3 +91,19 @@ function isGatedChannel(channelId) {
 }
 
 module.exports = { handleNewMember, handleMessage };
+
+// Auto-pin welcome message in Intros channel
+async function pinWelcomeInIntros(bot, userId, firstName, username) {
+  try {
+    const sentMessage = await bot.telegram.sendMessage(
+      config.publicChannels.intros,
+      `👋 Welcome ${firstName || username || 'friend'}! Please introduce yourself here.`
+    );
+    await bot.telegram.pinChatMessage(config.publicChannels.intros, sentMessage.message_id);
+    console.log(`[Gatekeeper] Pinned welcome for ${username || userId}`);
+  } catch (err) {
+    console.log(`[Gatekeeper] Pin failed: ${err.message}`);
+  }
+}
+
+module.exports.pinWelcomeInIntros = pinWelcomeInIntros;
