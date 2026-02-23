@@ -21,5 +21,9 @@
   "templates": {
     "nudge": "Hey [name]! 👋 We noticed you haven't been active in the Superteam MY Member Circle lately. We value active contributors who help grow the ecosystem. Is everything okay? We'd love to see you back — whether it's sharing insights, joining calls, or working on bounties. Let us know how we can help! 🤝",
     "welcome": "👋 Welcome to Superteam Malaysia!\n\nTo get started, introduce yourself in the Intros topic:\n\n• Your name\n• Where are you based?\n• A fun fact about you\n• How do you want to contribute to Superteam Malaysia?\n\nOnce you've posted your intro, you'll get full access to all channels. 🚀"
+  },
+  "introsTopicId": 36,
+  "welcome": {
+    "template": "👋 Welcome to Superteam Malaysia!\n\nTo get started, introduce yourself in the Intros topic:\n\n• Your name\n• Where are you based?\n• A fun fact about you\n• How do you want to contribute to Superteam Malaysia?\n\nOnce you've posted your intro, you'll get full access to all channels. 🚀"
   }
 }

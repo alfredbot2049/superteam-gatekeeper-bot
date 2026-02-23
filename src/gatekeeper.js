@@ -6,30 +6,24 @@ async function handleNewMember(ctx) {
     if (member.is_bot) continue;
 
     db.upsertUser(member.id, member.username || '', 0, member.first_name || '', 'public');
+    console.log(`[Gatekeeper] New member: ${member.username || member.id} — pending intro`);
 
-    // Mute new user until they complete intro
-    try {
-      await ctx.restrictChatMember(member.id, {
-        permissions: {
-          can_send_messages: false,
-          can_send_media_messages: false,
-          can_send_other_messages: false,
-          can_add_web_page_previews: false,
-        }
-      });
-      console.log(`[Gatekeeper] Muted ${member.username || member.id}`);
-    } catch (err) {
-      console.error('[Gatekeeper] Failed to mute:', err.message);
-    }
-
-    // Try DM first, fall back to in-group
+    // Try DM first, fall back to Intros topic
     try {
       await ctx.telegram.sendMessage(member.id, config.templates.welcome);
       console.log(`[Gatekeeper] Sent DM to ${member.username || member.id}`);
     } catch {
-      const sentMsg = await ctx.reply(config.templates.welcome);
-      try { await ctx.pinChatMessage(sentMsg.message_id); } catch {}
-      console.log(`[Gatekeeper] Sent in-group welcome for ${member.username || member.id}`);
+      try {
+        const sentMsg = await ctx.telegram.sendMessage(ctx.chat.id, config.templates.welcome, {
+          message_thread_id: config.introsTopicId
+        });
+        try { await ctx.pinChatMessage(sentMsg.message_id); } catch {}
+        console.log(`[Gatekeeper] Sent welcome in Intros topic for ${member.username || member.id}`);
+      } catch (err) {
+        const sentMsg = await ctx.reply(config.templates.welcome);
+        try { await ctx.pinChatMessage(sentMsg.message_id); } catch {}
+        console.log(`[Gatekeeper] Sent fallback welcome for ${member.username || member.id}`);
+      }
     }
   }
 }
@@ -47,33 +41,16 @@ async function handleMessage(ctx) {
     user = db.getUser(userId);
   }
 
+  // Already completed intro - let them through
   if (user && user.intro_completed) return;
 
-  const isIntros = topicId === config.publicChannels.intros
-    || ctx.chat.id === config.publicChannels.intros;
+  // Message is in the Intros topic - check if it's a valid intro
+  const isIntros = topicId === config.introsTopicId;
 
   if (isIntros) {
     if (isValidIntro(text)) {
       db.updateIntroStatus(userId, true);
-
-      // Unmute user - grant full permissions
-      try {
-        await ctx.restrictChatMember(userId, {
-          permissions: {
-            can_send_messages: true,
-            can_send_media_messages: true,
-            can_send_polls: true,
-            can_send_other_messages: true,
-            can_add_web_page_previews: true,
-            can_change_info: false,
-            can_invite_users: true,
-            can_pin_messages: false,
-          }
-        });
-        console.log(`[Gatekeeper] Unmuted ${ctx.from.username || userId}`);
-      } catch (err) {
-        console.error('[Gatekeeper] Failed to unmute:', err.message);
-      }
+      console.log(`[Gatekeeper] Intro accepted for ${ctx.from.username || userId}`);
 
       await ctx.reply(
         `✅ Welcome aboard, ${ctx.from.first_name || ctx.from.username || 'friend'}! ` +
@@ -83,20 +60,19 @@ async function handleMessage(ctx) {
     return;
   }
 
-  // If somehow they can still send (fallback) - delete and remind
-  if (isGatedChannel(topicId || ctx.chat.id)) {
-    try {
-      await ctx.deleteMessage();
-      const reminder = await ctx.reply(
-        `Hey ${ctx.from.first_name || ctx.from.username || 'there'}! 👋 ` +
-        `Please post your intro in the Intros channel first.`
-      );
-      setTimeout(() => {
-        ctx.telegram.deleteMessage(ctx.chat.id, reminder.message_id).catch(() => {});
-      }, 10000);
-    } catch (err) {
-      console.error('[Gatekeeper] Delete/remind failed:', err.message);
-    }
+  // User hasn't completed intro and posted OUTSIDE Intros topic — delete + remind
+  try {
+    await ctx.deleteMessage();
+    const reminder = await ctx.telegram.sendMessage(ctx.chat.id,
+      `Hey ${ctx.from.first_name || ctx.from.username || 'there'}! 👋 ` +
+      `Please post your intro in the Intros topic first before chatting in other channels.`,
+      { message_thread_id: topicId }
+    );
+    setTimeout(() => {
+      ctx.telegram.deleteMessage(ctx.chat.id, reminder.message_id).catch(() => {});
+    }, 10000);
+  } catch (err) {
+    console.error('[Gatekeeper] Delete/remind failed:', err.message);
   }
 }
 
@@ -105,15 +81,6 @@ function isValidIntro(text) {
   if (text.length < config.introValidation.minLength) return false;
   const lines = text.split('\n').filter(l => l.trim().length > 0);
   return lines.length >= config.introValidation.minLines || text.length >= 100;
-}
-
-function isGatedChannel(channelId) {
-  return [
-    config.publicChannels.general,
-    config.publicChannels.bounty,
-    config.publicChannels.career,
-    config.publicChannels.community,
-  ].includes(channelId);
 }
 
 module.exports = { handleNewMember, handleMessage };
