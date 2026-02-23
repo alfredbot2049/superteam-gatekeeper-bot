@@ -29,6 +29,16 @@ A dual-mode Telegram bot for [Superteam Malaysia](https://my.superteam.fun/) tha
             └───────────────┘
 ```
 
+## 🚀 Quick Setup for Admins
+
+1. Create bot via [@BotFather](https://t.me/BotFather)
+2. Add bot to your group
+3. Make bot admin (**delete messages + ban users**)
+4. Type `/setup` in the group
+5. Bot auto-configures — done
+
+---
+
 ## ✨ Features
 
 ### Mode 1: Public Group — Intro Gatekeeper
