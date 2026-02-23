@@ -43,6 +43,19 @@ bot.on('new_chat_members', (ctx) => {
   }
 });
 
+// Message routing based on group
+bot.on('message', async (ctx) => {
+  console.log('RECEIVED:', ctx.chat?.id, ctx.chat?.type, ctx.chat?.title);
+  if (!ctx.chat || !ctx.from) return;
+
+  if (ctx.isPublicGroup) {
+    await gatekeeper.handleMessage(ctx);
+  } else if (ctx.isMemberCircle) {
+    activity.trackMessage(ctx);
+    security.monitorMessage(ctx);
+  }
+});
+
 // ---- Commands ----
 
 // Shared commands (both groups)
@@ -95,19 +108,6 @@ bot.command('health', (ctx) => admin.handleHealth(ctx));
 
 // Security
 bot.command('security', (ctx) => security.handleSecurity(ctx));
-// Message routing based on group
-bot.on('message', async (ctx) => {
-  console.log('RECEIVED:', ctx.chat?.id, ctx.chat?.type, ctx.chat?.title);
-  if (!ctx.chat || !ctx.from) return;
-
-  if (ctx.isPublicGroup) {
-    await gatekeeper.handleMessage(ctx);
-  } else if (ctx.isMemberCircle) {
-    activity.trackMessage(ctx);
-    security.monitorMessage(ctx);
-  }
-});
-
 
 // ---- Scheduled Tasks (node-cron) ----
 
