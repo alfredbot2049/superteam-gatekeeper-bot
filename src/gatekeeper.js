@@ -31,6 +31,9 @@ async function handleNewMember(ctx) {
 async function handleMessage(ctx) {
   if (!ctx.from || ctx.from.is_bot) return;
 
+  const adminIds = (process.env.ADMIN_IDS || "").split(",").map(id => id.trim());
+  if (adminIds.includes(String(ctx.from.id))) return;
+
   const userId = ctx.from.id;
   const text = ctx.message.text || '';
   const topicId = ctx.message.message_thread_id;
