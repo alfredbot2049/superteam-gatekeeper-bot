@@ -1,13 +1,13 @@
 {
   "publicChannels": {
-    "general": -1001234567890,
-    "bounty": -1001234567891,
-    "community": -1001234567892,
-    "onboarding": -1001234567893,
-    "intros": -1001234567894,
-    "career": -1001234567895,
-    "announcement": -1001234567896,
-    "events": -1001234567897
+    "general": -5247865243,
+    "bounty": -5247865243,
+    "community": -5247865243,
+    "onboarding": -5247865243,
+    "intros": -5247865243,
+    "career": -5247865243,
+    "announcement": -5247865243,
+    "events": -5247865243
   },
   "thresholds": {
     "inactive": 14,
