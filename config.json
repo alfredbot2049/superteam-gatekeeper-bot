@@ -1,0 +1,25 @@
+{
+  "publicChannels": {
+    "general": -1001234567890,
+    "bounty": -1001234567891,
+    "community": -1001234567892,
+    "onboarding": -1001234567893,
+    "intros": -1001234567894,
+    "career": -1001234567895,
+    "announcement": -1001234567896,
+    "events": -1001234567897
+  },
+  "thresholds": {
+    "inactive": 14,
+    "veryInactive": 30,
+    "purge": 60
+  },
+  "introValidation": {
+    "minLength": 50,
+    "minLines": 3
+  },
+  "templates": {
+    "nudge": "Hey [name]! 👋 We noticed you haven't been active in the Superteam MY Member Circle lately. We value active contributors who help grow the ecosystem. Is everything okay? We'd love to see you back — whether it's sharing insights, joining calls, or working on bounties. Let us know how we can help! 🤝",
+    "welcome": "👋 Welcome to Superteam Malaysia!\n\nTo get started, please introduce yourself in the Intros channel using this format:\n\n• Who are you & what do you do?\n• Where are you based?\n• One fun fact about you\n• How are you looking to contribute to Superteam MY?\n\n✨ Example:\n\"Hey everyone! I'm Marianne 👋 Together with Han, we are Co-Leads of Superteam Malaysia! 📍 Based in Kuala Lumpur and Network School 🧑‍🎓 Fun fact: My first Solana project was building an AI Telegram trading bot 🤝 Looking to contribute by connecting builders with mentors, helping teams refine their story, and supporting members who want to go from building quietly to shipping publicly\"\n\nOnce you've posted your intro, you'll have full access to all channels. See you there! 🚀"
+  }
+}
